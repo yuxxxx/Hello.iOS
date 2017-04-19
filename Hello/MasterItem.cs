@@ -6,23 +6,24 @@ using CoreLocation;
 
 namespace info.yunnxx.Hello
 {
+    // MKAnnotation継承してないとMKMapView#AddAnnotations(params IMkAnnotation[])が死ぬ
+    // IMKAnnotation実装だとなぜか動かなかった
     public class MasterItem: MapKit.MKAnnotation
     {
         public MasterItem(string title, float x, float y)
         {
             _Title = title;
-            Pos = new PointF(x, y);
+            _Coordinate = new CLLocationCoordinate2D(x, y);
         }
 
         string _Title;
-        PointF Pos;
         public override string Title => _Title;
-        public override CLLocationCoordinate2D Coordinate => new CLLocationCoordinate2D(Pos.X, Pos.Y);
+
+        CLLocationCoordinate2D _Coordinate;
+        public override CLLocationCoordinate2D Coordinate => _Coordinate;
 
         public string Hello { get; set; }
         public string Language { get; set; }
-        public int Locale { get; set; }
-
     }
 
     public class MasterList : IReadOnlyList<MasterItem>

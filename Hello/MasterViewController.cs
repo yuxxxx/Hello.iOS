@@ -59,7 +59,7 @@ namespace Hello
 		class DataSource : UITableViewSource
 		{
 			static readonly NSString CellIdentifier = new NSString("Cell");
-			readonly IReadOnlyList<object> objects = new List<object>();
+			readonly IReadOnlyList<object> objects;
 			readonly MasterViewController controller;
 
 			public DataSource(MasterViewController controller)
@@ -92,12 +92,6 @@ namespace Hello
                 cell.TextLabel.Text = (objects[indexPath.Row] as MasterItem).Title;
 
 				return cell;
-			}
-
-			public override bool CanEditRow(UITableView tableView, NSIndexPath indexPath)
-			{
-				// Return false if you do not want the specified item to be editable.
-				return true;
 			}
 
 			public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
