@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using info.yunnxx.Hello;
 
 using UIKit;
 using Foundation;
@@ -24,12 +25,6 @@ namespace Hello
 			Title = NSBundle.MainBundle.LocalizedString("Master", "Master");
 
 			// Perform any additional setup after loading the view, typically from a nib.
-			NavigationItem.LeftBarButtonItem = EditButtonItem;
-
-			var addButton = new UIBarButtonItem(UIBarButtonSystemItem.Add, AddNewItem);
-			addButton.AccessibilityLabel = "addButton";
-			NavigationItem.RightBarButtonItem = addButton;
-
 			DetailViewController = (DetailViewController)((UINavigationController)SplitViewController.ViewControllers[1]).TopViewController;
 
 			TableView.Source = dataSource = new DataSource(this);
@@ -45,14 +40,6 @@ namespace Hello
 		{
 			base.DidReceiveMemoryWarning();
 			// Release any cached data, images, etc that aren't in use.
-		}
-
-		void AddNewItem(object sender, EventArgs args)
-		{
-			dataSource.Objects.Insert(0, DateTime.Now);
-
-			using (var indexPath = NSIndexPath.FromRowSection(0, 0))
-				TableView.InsertRows(new[] { indexPath }, UITableViewRowAnimation.Automatic);
 		}
 
 		public override void PrepareForSegue(UIStoryboardSegue segue, NSObject sender)
@@ -72,15 +59,16 @@ namespace Hello
 		class DataSource : UITableViewSource
 		{
 			static readonly NSString CellIdentifier = new NSString("Cell");
-			readonly List<object> objects = new List<object>();
+			readonly IReadOnlyList<object> objects = new List<object>();
 			readonly MasterViewController controller;
 
 			public DataSource(MasterViewController controller)
 			{
 				this.controller = controller;
+                objects = new MasterList();
 			}
 
-			public IList<object> Objects
+			public IReadOnlyList<object> Objects
 			{
 				get { return objects; }
 			}
@@ -101,7 +89,7 @@ namespace Hello
 			{
 				var cell = tableView.DequeueReusableCell(CellIdentifier, indexPath);
 
-				cell.TextLabel.Text = objects[indexPath.Row].ToString();
+                cell.TextLabel.Text = (objects[indexPath.Row] as MasterItem).Title;
 
 				return cell;
 			}
@@ -110,20 +98,6 @@ namespace Hello
 			{
 				// Return false if you do not want the specified item to be editable.
 				return true;
-			}
-
-			public override void CommitEditingStyle(UITableView tableView, UITableViewCellEditingStyle editingStyle, NSIndexPath indexPath)
-			{
-				if (editingStyle == UITableViewCellEditingStyle.Delete)
-				{
-					// Delete the row from the data source.
-					objects.RemoveAt(indexPath.Row);
-					controller.TableView.DeleteRows(new[] { indexPath }, UITableViewRowAnimation.Fade);
-				}
-				else if (editingStyle == UITableViewCellEditingStyle.Insert)
-				{
-					// Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view.
-				}
 			}
 
 			public override void RowSelected(UITableView tableView, NSIndexPath indexPath)
